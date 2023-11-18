@@ -6,6 +6,7 @@ To compile on Debian:
 
 To cross-compile with mingw64:
 - ./cross-compile.sh
+- wineconsole bin/usr/local/bin/gnometest.exe
 
 To compile from MSYS2 on Windows:
 - ./windows-setup.sh
