@@ -10,3 +10,6 @@ To cross-compile with mingw64:
 To compile from MSYS2 on Windows:
 - ./windows-setup.sh
 - ./build.sh
+
+Suggested IDE:
+- https://wiki.gnome.org/Apps/Builder
