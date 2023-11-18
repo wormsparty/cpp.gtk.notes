@@ -1,0 +1,12 @@
+a.out
+bin
+obj
+Makefile
+*.o
+*.stash
+*.user
+*.filters
+.vscode
+.qtc_clangd
+subprojects
+meson
