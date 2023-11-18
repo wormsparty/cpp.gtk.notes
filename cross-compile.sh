@@ -14,10 +14,17 @@ fi
 meson/bin/meson setup --cross-file cross.meson build-mingw
 meson/bin/meson compile -C build-mingw
 
-rm -fr ./bin
-mkdir -p ./bin
-DESTDIR=./../bin meson/bin/meson install -C build-mingw
+rm -fr ./dist
+mkdir -p ./dist
+DESTDIR=./../dist meson/bin/meson install -C build-mingw
+	
+mv ./dist/usr/local/bin ./tmp
+rm -fr ./dist/
+mv ./tmp ./dist
+find ./dist -name \*.exe -not -name 'gnometest.exe' -exec rm {} \;
 
-cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libssp-0.dll ./bin/usr/local/bin/
-cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libstdc++-6.dll ./bin/usr/local/bin/
-cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libgcc_s_seh-1.dll ./bin/usr/local/bin/
+cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libssp-0.dll ./dist/
+cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libstdc++-6.dll ./dist/
+cp /usr/lib/gcc/x86_64-w64-mingw32/12-win32/libgcc_s_seh-1.dll ./dist/
+
+echo "-> Windows package with DLL has been deployed to '$PWD/dist/'"
