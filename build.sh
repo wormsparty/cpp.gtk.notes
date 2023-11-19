@@ -9,9 +9,13 @@ if [ -d /mingw64 ]; then
 	PREFIX="--prefix /mingw64"
 fi
 
-rm -fr ./bin
-mkdir -p ./bin
+rm -fr ./dist
+mkdir -p ./dist
 
 meson setup ./work $PREFIX
 meson compile -C ./work
-DESTDIR=./../bin meson install -C ./work
+DESTDIR=./../dist meson install -C ./work
+
+mv ./dist/usr/local/bin ./tmp
+rm -fr ./dist/
+mv ./tmp ./dist
