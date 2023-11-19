@@ -2,6 +2,12 @@
 #include <libsoup/soup.h>
 #include <glib.h>
 
+struct window_info_t {
+    GtkWindow* window;
+    GtkInfoBar* bar;
+    GtkLabel* message_label;
+};
+
 static bool send_message() {
     g_autoptr(SoupSession) session = soup_session_new ();
     g_autoptr(SoupMessage) message = soup_message_new (SOUP_METHOD_POST, "http://localhost:5000");
@@ -25,6 +31,12 @@ static bool send_message() {
     return true;
 }
 
+static void show_error_message(window_info_t* infos, const char* msg) {
+    gtk_label_set_text (infos->message_label, msg);
+    gtk_info_bar_set_message_type (infos->bar, GTK_MESSAGE_ERROR);
+    gtk_widget_show (GTK_WIDGET (infos->bar));
+}
+
 int main (int argc, char **argv) {
   GtkApplication *app = gtk_application_new ("org.gtk.gtktest",
                                              G_APPLICATION_DEFAULT_FLAGS);
@@ -39,9 +51,18 @@ int main (int argc, char **argv) {
       gtk_grid_set_row_spacing(grid, 5);
       gtk_grid_set_column_spacing(grid, 5);
 
+      auto bar = GTK_INFO_BAR (gtk_info_bar_new ());
+      gtk_widget_set_visible(GTK_WIDGET (bar), false);
+      auto message_label = GTK_LABEL (gtk_label_new (""));
+      gtk_info_bar_add_child (bar, GTK_WIDGET (message_label));
+      gtk_info_bar_add_button (bar, "_OK", GTK_RESPONSE_OK);
+
       GtkWidget *button_send = gtk_button_new_with_label("Send message");
       GtkWidget *button_folder = gtk_button_new_with_label("Choose folder");
       GtkWidget *button_quit = gtk_button_new_with_label("Quit");
+
+      g_signal_connect(G_OBJECT (bar), "response",
+                       G_CALLBACK (gtk_widget_hide), nullptr);
 
       g_signal_connect (G_OBJECT (button_send), "clicked",
                         G_CALLBACK (send_message), nullptr);
@@ -51,31 +72,37 @@ int main (int argc, char **argv) {
             g_application_quit(G_APPLICATION(app));
         }), app);
 
+      auto infos = new window_info_t;
+      infos->window = window;
+      infos->bar = bar;
+      infos->message_label = message_label;
+
       g_signal_connect (G_OBJECT (button_folder), "clicked",
-        G_CALLBACK (+[](GtkWidget*, gpointer window) {
-            auto chooser = gtk_file_chooser_native_new("Choose a folder", GTK_WINDOW(window),
+        G_CALLBACK (+[](GtkWidget*, window_info_t* infos) {
+            auto chooser = gtk_file_chooser_native_new("Choose a folder", GTK_WINDOW(infos->window),
                                GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                "_Open", "_Cancel");
 
             g_signal_connect(chooser, "response",
-                G_CALLBACK(+[](GtkFileChooser* chooser, GtkResponseType response, gpointer) {
+                G_CALLBACK(+[](GtkFileChooser* chooser, GtkResponseType response, window_info_t* infos) {
                     if (response == GTK_RESPONSE_ACCEPT) {
                         g_autoptr(GFile) folderpath = gtk_file_chooser_get_current_folder(chooser);
                         gchar* foldername = g_file_get_path(folderpath);
                         g_print("%s\n", foldername);
                         g_free(foldername);
                     } else {
-                        g_print("Canceled\n");
+                        show_error_message(infos, "Cancelled");
                     }
-                }), nullptr);
+                }), infos);
 
             gtk_native_dialog_set_modal(GTK_NATIVE_DIALOG (chooser), true);
             gtk_native_dialog_show(GTK_NATIVE_DIALOG (chooser));
-        }), window);
+        }), infos);
 
-      gtk_grid_attach(grid, button_send, 0, 0, 1, 1);
-      gtk_grid_attach(grid, button_folder, 0, 1, 1, 1);
-      gtk_grid_attach(grid, button_quit, 0, 2, 1, 1);
+      gtk_grid_attach(grid, GTK_WIDGET (bar), 0, 0, 1, 1);
+      gtk_grid_attach(grid, button_send, 0, 1, 1, 1);
+      gtk_grid_attach(grid, button_folder, 0, 2, 1, 1);
+      gtk_grid_attach(grid, button_quit, 0, 3, 1, 1);
 
       gtk_window_set_child(window, GTK_WIDGET (grid));
       gtk_window_present (window);
