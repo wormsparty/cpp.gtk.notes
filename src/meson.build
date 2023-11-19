@@ -2,23 +2,34 @@ gnometest_sources = [
   'main.cpp'
 ]
 
-gtk_dep = dependency(
-  'gtk4',
-  version: '>= 4.0.0',
-  fallback: ['gtk', 'gtk_dep'],
-  default_options: [
-    'introspection=disabled',
-    'build-demos=false',
-    'build-testsuite=false',
-    'build-tests=false',
-    'build-examples=false',
-    'media-gstreamer=disabled',
-    'print-cups=disabled',
-  ]
-)
-
 gnometest_deps = [
-  gtk_dep,
+  dependency(
+    'gtk4',
+    version: '>= 4.0.0',
+    fallback: ['gtk', 'gtk4'],
+    default_options: [
+      'introspection=disabled',
+      'build-demos=false',
+      'build-testsuite=false',
+      'build-tests=false',
+      'build-examples=false',
+      'media-gstreamer=disabled',
+      'print-cups=disabled',
+    ]
+  ),
+  dependency(
+    'libsoup-3.0',
+    version: '>= 3.0.0',
+    fallback: ['libsoup-3.0', 'libsoup3'],
+    default_options: [
+      'introspection=disabled',
+      'vapi=disabled',
+      'docs=disabled',
+      'tests=false',
+      'autobahn=disabled',
+      'pkcs11_tests=disabled',
+    ]
+  ),
 ]
 
 executable('gnometest', gnometest_sources,
