@@ -30,6 +30,7 @@ gnometest_deps = [
       'pkcs11_tests=disabled',
     ]
   ),
+  dependency('glib-2.0'),
 ]
 
 executable('gnometest', gnometest_sources,
