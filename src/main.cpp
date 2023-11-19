@@ -32,12 +32,12 @@ int main (int argc, char **argv) {
   g_signal_connect (app, "activate", G_CALLBACK (
     +[](GtkApplication* app, gpointer) {
       auto window = GTK_WINDOW (gtk_application_window_new (app));
-      gtk_window_set_title (GTK_WINDOW (window), "GTK test");
-      gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
+      gtk_window_set_title (window, "GTK test");
+      gtk_window_set_default_size (window, 640, 480);
 
-      GtkWidget *grid = gtk_grid_new();
-      gtk_grid_set_row_spacing(GTK_GRID (grid), 5);
-      gtk_grid_set_column_spacing(GTK_GRID (grid), 5);
+      auto grid = GTK_GRID (gtk_grid_new());
+      gtk_grid_set_row_spacing(grid, 5);
+      gtk_grid_set_column_spacing(grid, 5);
 
       GtkWidget *button_send = gtk_button_new_with_label("Send message");
       GtkWidget *button_quit = gtk_button_new_with_label("Quit");
@@ -50,11 +50,11 @@ int main (int argc, char **argv) {
                             g_application_quit(G_APPLICATION(app));
                         }), app);
 
-      gtk_grid_attach(GTK_GRID (grid), button_send, 0, 0, 1, 1);
-      gtk_grid_attach(GTK_GRID (grid), button_quit, 0, 1, 1, 1);
+      gtk_grid_attach(grid, button_send, 0, 0, 1, 1);
+      gtk_grid_attach(grid, button_quit, 0, 1, 1, 1);
 
-      gtk_window_set_child(window, grid);
-      gtk_window_present (GTK_WINDOW (window));
+      gtk_window_set_child(window, GTK_WIDGET (grid));
+      gtk_window_present (window);
   }), nullptr);
 
   int status = g_application_run (G_APPLICATION (app), argc, argv);
