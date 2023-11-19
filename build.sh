@@ -12,6 +12,6 @@ fi
 rm -fr ./bin
 mkdir -p ./bin
 
-meson setup ./build $PREFIX
-meson compile -C ./build
-DESTDIR=./../bin meson install -C ./build
+meson setup ./work $PREFIX
+meson compile -C ./work
+DESTDIR=./../bin meson install -C ./work
