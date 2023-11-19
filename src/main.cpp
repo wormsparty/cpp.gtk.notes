@@ -25,37 +25,38 @@ static bool send_message() {
     return true;
 }
 
-static void activate (GtkApplication* app, [[maybe_unused]] gpointer user_data) {
-  auto window = GTK_WINDOW (gtk_application_window_new (app));
-  gtk_window_set_title (GTK_WINDOW (window), "GTK test");
-  gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
-
-  GtkWidget *grid = gtk_grid_new();
-  gtk_grid_set_row_spacing(GTK_GRID (grid), 5);
-  gtk_grid_set_column_spacing(GTK_GRID (grid), 5);
-
-  GtkWidget *button_send = gtk_button_new_with_label("Send message");
-  GtkWidget *button_quit = gtk_button_new_with_label("Quit");
-
-  g_signal_connect (G_OBJECT (button_send), "clicked",
-                    G_CALLBACK (send_message), nullptr);
-
-  g_signal_connect (G_OBJECT (button_quit), "clicked",
-                    G_CALLBACK (+[]([[maybe_unused]] GtkWidget* widget, gpointer data) {
-                        g_application_quit(G_APPLICATION(data));
-                    }), G_OBJECT (app));
-
-  gtk_grid_attach(GTK_GRID (grid), button_send, 0, 0, 1, 1);
-  gtk_grid_attach(GTK_GRID (grid), button_quit, 0, 1, 1, 1);
-
-  gtk_window_set_child(window, grid);
-  gtk_window_present (GTK_WINDOW (window));
-}
-
 int main (int argc, char **argv) {
   GtkApplication *app = gtk_application_new ("org.gtk.gtktest",
                                              G_APPLICATION_DEFAULT_FLAGS);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), nullptr);
+
+  g_signal_connect (app, "activate", G_CALLBACK (
+    +[](GtkApplication* app, gpointer) {
+      auto window = GTK_WINDOW (gtk_application_window_new (app));
+      gtk_window_set_title (GTK_WINDOW (window), "GTK test");
+      gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
+
+      GtkWidget *grid = gtk_grid_new();
+      gtk_grid_set_row_spacing(GTK_GRID (grid), 5);
+      gtk_grid_set_column_spacing(GTK_GRID (grid), 5);
+
+      GtkWidget *button_send = gtk_button_new_with_label("Send message");
+      GtkWidget *button_quit = gtk_button_new_with_label("Quit");
+
+      g_signal_connect (G_OBJECT (button_send), "clicked",
+                        G_CALLBACK (send_message), nullptr);
+
+      g_signal_connect (G_OBJECT (button_quit), "clicked",
+                        G_CALLBACK (+[](GtkWidget*, gpointer app) {
+                            g_application_quit(G_APPLICATION(app));
+                        }), app);
+
+      gtk_grid_attach(GTK_GRID (grid), button_send, 0, 0, 1, 1);
+      gtk_grid_attach(GTK_GRID (grid), button_quit, 0, 1, 1, 1);
+
+      gtk_window_set_child(window, grid);
+      gtk_window_present (GTK_WINDOW (window));
+  }), nullptr);
+
   int status = g_application_run (G_APPLICATION (app), argc, argv);
   g_object_unref (app);
 
