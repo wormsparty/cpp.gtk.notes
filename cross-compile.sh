@@ -1,10 +1,12 @@
 #!/bin/sh
 
+cd "`dirname $0`"
+
 if ! which "x86_64-w64-mingw32-g++"; then
-	sudo apt-get install mingw-w64 python3-pip python3-venv wine bison flex
+	sudo apt-get install mingw-w64 python3-pip python3-venv wine bison flex doxygen xsltproc
+	./debian-setup.sh
 fi
 
-cd "`dirname $0`"
 
 if [ ! -d meson ]; then
 	python3 -m venv meson

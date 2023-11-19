@@ -1,6 +1,5 @@
-#include <gtk/gtk.h>
+#include <gtkmm.h>
 #include <libsoup/soup.h>
-#include <glib.h>
 
 static bool send_message() {
     g_autoptr(SoupSession) session = soup_session_new ();
@@ -25,40 +24,45 @@ static bool send_message() {
     return true;
 }
 
-static void activate (GtkApplication* app, [[maybe_unused]] gpointer user_data) {
-  auto window = GTK_WINDOW (gtk_application_window_new (app));
-  gtk_window_set_title (GTK_WINDOW (window), "GTK test");
-  gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
+class MyWindow : public Gtk::Window
+{
+private:
+  Gtk::Button button_send;
+  Gtk::Button button_quit;
 
-  GtkWidget *grid = gtk_grid_new();
-  gtk_grid_set_row_spacing(GTK_GRID (grid), 5);
-  gtk_grid_set_column_spacing(GTK_GRID (grid), 5);
+public:
+  MyWindow();
+};
 
-  GtkWidget *button_send = gtk_button_new_with_label("Send message");
-  GtkWidget *button_quit = gtk_button_new_with_label("Quit");
+MyWindow::MyWindow()
+{
+  set_title("GTK test");
+  set_default_size(640, 480);
 
-  g_signal_connect (G_OBJECT (button_send), "clicked",
-                    G_CALLBACK (send_message), nullptr);
+  Gtk::Grid grid {};
+  grid.set_row_spacing(5);
+  grid.set_column_spacing(5);
 
-  g_signal_connect (G_OBJECT (button_quit), "clicked",
-                    G_CALLBACK (+[]([[maybe_unused]] GtkWidget* widget, gpointer data) {
-                        g_application_quit(G_APPLICATION(data));
-                    }), G_OBJECT (app));
+  button_send.set_label("Send message");
 
-  gtk_grid_attach(GTK_GRID (grid), button_send, 0, 0, 1, 1);
-  gtk_grid_attach(GTK_GRID (grid), button_quit, 0, 1, 1, 1);
+  button_send.signal_clicked().connect([&]() {
+    send_message();
+  });
 
-  gtk_window_set_child(window, grid);
-  gtk_window_present (GTK_WINDOW (window));
+  button_quit.set_label("Quit");
+
+  button_quit.signal_clicked().connect([&]() {
+    get_application()->quit();
+  });
+
+  grid.attach(button_send, 0, 0, 1, 1);
+  grid.attach(button_quit, 0, 1, 1, 1);
+
+  set_child(grid);
 }
 
 int main (int argc, char **argv) {
-  GtkApplication *app = gtk_application_new ("org.gtk.gtktest",
-                                             G_APPLICATION_DEFAULT_FLAGS);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), nullptr);
-  int status = g_application_run (G_APPLICATION (app), argc, argv);
-  g_object_unref (app);
-
-  return status;
+  auto app = Gtk::Application::create("org.gtk.gtktest");
+  return app->make_window_and_run<MyWindow>(argc, argv);
 }
 
