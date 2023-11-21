@@ -81,7 +81,9 @@ static void activate(GtkApplication* app, gpointer) {
     GtkWidget *button_send = gtk_button_new_with_label("Send message");
     GtkWidget *button_folder = gtk_button_new_with_label("Choose folder");
     GtkWidget *button_quit = gtk_button_new_with_label("Quit");
+
     auto textbox = gtk_text_view_new();
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW (textbox), GTK_WRAP_WORD_CHAR);
 
     g_signal_connect(G_OBJECT (bar), "response",
                      G_CALLBACK (gtk_widget_hide), nullptr);
