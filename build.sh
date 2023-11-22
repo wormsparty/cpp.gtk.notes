@@ -34,7 +34,7 @@ if [ -f ./main.exe ]; then
 	mkdir -p ./dist/win32/share/glib-2.0
 	cp -r "$PREFIX/share/glib-2.0/schemas" ./dist/win32/share/glib-2.0/
 	glib-compile-schemas ./dist/win32/share/glib-2.0/schemas
-	find ./dist/win32/share/glib-2.0/schemas -not -name gschemas.compiles -exec rm {} \;
+	find ./dist/win32/share/glib-2.0/schemas -not -name gschemas.compiled -exec rm {} \;
 	
 	# Add some theming
 	if [ ! -d work/Windows-10 ]; then
