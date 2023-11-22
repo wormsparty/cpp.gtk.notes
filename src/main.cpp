@@ -41,7 +41,7 @@ static void folder_choice_closed(GtkFileChooser* chooser,
                                  GtkResponseType response,
                                  window_info_t* infos) {
     if (response == GTK_RESPONSE_ACCEPT) {
-        g_autoptr(GFile) folderpath = gtk_file_chooser_get_current_folder(chooser);
+        g_autoptr(GFile) folderpath = gtk_file_chooser_get_file(chooser);
         gchar* foldername = g_file_get_path(folderpath);
         g_print("%s\n", foldername);
         g_free(foldername);

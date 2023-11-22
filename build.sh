@@ -16,6 +16,16 @@ meson setup ./work $PREFIX
 meson compile -C ./work
 DESTDIR=./../dist meson install -C ./work
 
-mv ./dist/usr/local/bin ./tmp
-rm -fr ./dist/
-mv ./tmp ./dist
+if [ `uname -o` = 'Msys' ]; then
+	find ./dist -name \*.exe -exec mv {} ./main.exe \;
+	rm -fr ./dist/*
+	mv main.exe ./dist/
+	echo "Copying DLL..."
+	ldd ./dist/main.exe | grep -vi '/c/windows' | grep '/.*.dll' -o | xargs -I{} cp "{}" ./dist
+	echo "-> Windows package with DLL has been deployed to '$PWD/dist/'"
+else
+	find ./dist -type f -exec mv {} ./main \;
+	rm -fr ./dist/*
+	mv ./main dist/main
+	echo "-> Executable has been deployed to '$PWD/dist/main'"
+fi
