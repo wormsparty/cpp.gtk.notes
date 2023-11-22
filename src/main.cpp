@@ -1,6 +1,5 @@
-#include <gtk/gtk.h>
+#include <gtkmm.h>
 #include <libsoup/soup.h>
-#include <glib.h>
 
 struct window_info_t {
     GtkWindow* window;

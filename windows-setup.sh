@@ -6,4 +6,4 @@ if ! which pacman; then
 	exit 1
 fi
 
-pacman -S git mingw-w64-x86_64-meson mingw-w64-x86_64-python3 mingw-w64-x86_64-gtk4
+pacman -S git mingw-w64-x86_64-meson mingw-w64-x86_64-python3 mingw-w64-x86_64-gtkmm-4.0 mingw-w64-x86_64-libsoup3
