@@ -36,24 +36,14 @@ if [ -f ./main.exe ]; then
 	glib-compile-schemas ./dist/win32/share/glib-2.0/schemas
 	find ./dist/win32/share/glib-2.0/schemas -not -name gschemas.compiled -exec rm {} \;
 	
-	# Add some theming
-	if [ ! -d work/Windows-10 ]; then
-		git clone https://github.com/B00merang-Project/Windows-10.git work/Windows-10
-        fi
-
-	cd work/Windows-10
-	git pull
-	cd -
-
-	mkdir -p ./dist/win32/share/themes/Windows10/
-	cp -r work/Windows-10/gtk-4.0 ./dist/win32/share/themes/Windows10/
-
 	mkdir -p ./dist/win32/etc/gtk-4.0
 	cat << EOT > ./dist/win32/etc/gtk-4.0/settings.ini
 [Settings]
 gtk-theme-name=Windows10
 gtk-font-name=Segoe UI 9
 EOT
+	
+	cp -r "$PREFIX/share/icons" ./dist/win32/share/
 
 	echo "-> Windows package with DLL has been deployed to '$PWD/dist/'"
 else
