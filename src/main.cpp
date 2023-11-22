@@ -103,10 +103,29 @@ static void activate(GtkApplication* app, gpointer) {
     g_signal_connect (G_OBJECT (button_folder), "clicked",
         G_CALLBACK (folder_choice_opened), infos);
 
+    auto toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    auto open_button = gtk_button_new_from_icon_name("document-open");
+
+    g_signal_connect (G_OBJECT (open_button), "clicked",
+        G_CALLBACK (+[](GtkWidget*, gpointer) {
+            g_print ("Button 1\n");
+        }), app);
+    
+    auto close_button = gtk_button_new_from_icon_name("window-close");
+    
+    g_signal_connect (G_OBJECT (close_button), "clicked",
+        G_CALLBACK (+[](GtkWidget*, gpointer) {
+            g_print ("Button 2\n");
+        }), app);
+
+    gtk_box_append(GTK_BOX (toolbar), open_button);
+    gtk_box_append(GTK_BOX (toolbar), close_button);
+
     auto scrolled_window = gtk_scrolled_window_new ();
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW (scrolled_window), textbox);
 
     gtk_widget_set_hexpand(bar, true);
+    gtk_widget_set_hexpand(toolbar, true);
     gtk_widget_set_hexpand(button_send, true);
     gtk_widget_set_hexpand(button_folder, true);
     gtk_widget_set_hexpand(button_quit, true);
@@ -114,10 +133,11 @@ static void activate(GtkApplication* app, gpointer) {
     gtk_widget_set_vexpand(textbox, true);
 
     gtk_grid_attach(grid, bar, 0, 0, 1, 1);
-    gtk_grid_attach(grid, button_send, 0, 1, 1, 1);
-    gtk_grid_attach(grid, button_folder, 0, 2, 1, 1);
-    gtk_grid_attach(grid, button_quit, 0, 3, 1, 1);
-    gtk_grid_attach(grid, scrolled_window, 0, 4, 1, 1);
+    gtk_grid_attach(grid, toolbar, 0, 1, 1, 1);
+    gtk_grid_attach(grid, button_send, 0, 2, 1, 1);
+    gtk_grid_attach(grid, button_folder, 0, 3, 1, 1);
+    gtk_grid_attach(grid, button_quit, 0, 4, 1, 1);
+    gtk_grid_attach(grid, scrolled_window, 0, 5, 1, 1);
 
     gtk_window_set_child(window, GTK_WIDGET (grid));
     gtk_window_present (window);
