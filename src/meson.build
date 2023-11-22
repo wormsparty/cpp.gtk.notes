@@ -3,7 +3,7 @@ gnometest_sources = [
 ]
 
 gnometest_deps = [
-  dependency('gtkmm-4.0'),
+  dependency('gtk4'),
   dependency('libsoup-3.0'),
 ]
 
