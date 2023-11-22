@@ -1,4 +1,4 @@
-#include <gtkmm.h>
+#include <gtk/gtk.h>
 #include <libsoup/soup.h>
 
 struct window_info_t {
