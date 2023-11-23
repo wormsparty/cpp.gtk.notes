@@ -39,7 +39,7 @@ if [ -f ./main.exe ]; then
 	mkdir -p ./dist/win32/etc/gtk-4.0
 	cat << EOT > ./dist/win32/etc/gtk-4.0/settings.ini
 [Settings]
-gtk-theme-name=Windows10
+gtk-theme-name=win32
 gtk-font-name=Segoe UI 9
 EOT
 	
