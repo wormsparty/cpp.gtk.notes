@@ -1,5 +1,6 @@
+#include <glib.h>
+#include <gio/gio.h>
 #include <gtk/gtk.h>
-#include <libsoup/soup.h>
 
 struct window_info_t {
     GtkWindow* window;
@@ -8,25 +9,32 @@ struct window_info_t {
 };
 
 static bool send_message() {
-    g_autoptr(SoupSession) session = soup_session_new ();
-    g_autoptr(SoupMessage) message = soup_message_new (SOUP_METHOD_POST, "http://localhost:5000");
+    g_autoptr(GSocketClient) client = g_socket_client_new();
+    GError* error = nullptr;
 
-    const char* args = "foo=bar&one=two";
+    g_autoptr(GSocketConnection) connection = g_socket_client_connect_to_host(
+        client, "localhost", 5000, nullptr, &error);
 
-    g_autoptr(GBytes) args_b = g_bytes_new (args, strlen(args));
-    soup_message_set_request_body_from_bytes(
-        message, "application/x-www-form-urlencoded", args_b);
+    if (error != nullptr) {
+      g_error (error->message);
+      g_clear_error(&error);
+    } else {
+      g_print ("Connection successful!\n");
 
-    GError *error = nullptr;
-    g_autoptr(GBytes) bytes = soup_session_send_and_read(session, message, nullptr, &error);
+      //GInputStream* istream = g_io_stream_get_input_stream (G_IO_STREAM (connection));
+      GOutputStream* ostream = g_io_stream_get_output_stream (G_IO_STREAM (connection));
+  
+      auto msg = "Hello, server!";
+      g_output_stream_write(ostream, msg, strlen(msg), nullptr, &error);
 
-    if (error) {
-        g_printerr ("Failed to POST: %s\n", error->message);
-        g_error_free (error);
-        return false;
+      if (error != nullptr) {
+        g_error (error->message);
+        g_clear_error(&error);
+      } else {
+	g_print("Message sent successfully\n");
+      }
     }
 
-    g_print ("Received: %s\n", (char*)g_bytes_get_data(bytes, nullptr));
     return true;
 }
 
@@ -144,14 +152,11 @@ static void activate(GtkApplication* app, gpointer) {
 }
 
 int main (int argc, char **argv) {
-    GtkApplication *app = gtk_application_new ("org.gtk.gtktest",
+    g_autoptr(GtkApplication) app = gtk_application_new ("org.gtk.gtktest",
                                                G_APPLICATION_DEFAULT_FLAGS);
 
     g_signal_connect (app, "activate", G_CALLBACK (activate), nullptr);
 
-    int status = g_application_run (G_APPLICATION (app), argc, argv);
-    g_object_unref (app);
-
-    return status;
+    return g_application_run (G_APPLICATION (app), argc, argv);
 }
 
