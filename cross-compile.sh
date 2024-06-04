@@ -7,6 +7,11 @@ if ! which "x86_64-w64-mingw32-g++"; then
 	./debian-setup.sh
 fi
 
+if [ ! -f meson/bin/meson ];
+        if [ -d meson ]; then
+                rm -fr meson/
+        fi
+fi
 
 if [ ! -d meson ]; then
 	python3 -m venv meson
